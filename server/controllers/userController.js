@@ -1,7 +1,6 @@
-
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import User from '../models/user';
+import User from '../models/user.js'; // filepath: f:\GoCart\server\controllers\userController.js
 
 // Register User : api/user/register
 
