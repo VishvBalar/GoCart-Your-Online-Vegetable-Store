@@ -27,11 +27,11 @@ export const registerUser = async (req, res) => {
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 7*24*60*60*1000
         });
 
-        return res.status(201).json({success: true, user : {email: user.email, name: user.name}});
+        return res.status(201).json({success: true, user: {email: user.email, name: user.name}, token});
     } catch (error) {
         console.log(error.message);
         res.status(500).json({success: false, message: error.message});
@@ -66,10 +66,12 @@ export const loginUser = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 7*24*60*60*1000
+            maxAge: 7*24*60*60*1000,
+            path: '/',
+
         });
 
-        return res.status(201).json({success: true, user : {email: user.email, name: user.name}});
+        return res.status(201).json({success: true, user: {email: user.email, name: user.name}, token});
         
     } catch (error) {
         console.log(error.message);
@@ -81,9 +83,7 @@ export const loginUser = async (req, res) => {
 
 export const isAuth = async (req, res) => {
     try {
-        const {userId} = req.body;
-        const user = await User.findById(userId).select('-password');
-
+        const user = await User.findById(req.user.id).select('-password');
         return res.status(200).json({success: true, user});
     } catch (error) {
         console.log(error.message);
