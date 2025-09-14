@@ -131,6 +131,25 @@ export const AppContextProvider = ({ children }) => {
         fetchProducts();
     }, []);
 
+    // to update cart items in db when cartItems state changes
+
+    useEffect(() => {
+        const updateCart = async () => {
+            try {
+                const { data } = await axios.post('/api/cart/update', { cartItems }, { withCredentials: true });
+                if(!data.success){
+                    toast.error(data.message);
+                }
+            } catch (error) {
+                toast.error(error.message);
+            }
+        }
+
+        if(user){
+            updateCart();
+        }
+    },[cartItems])
+
     const value = {
         navigate,
         user,
@@ -150,7 +169,8 @@ export const AppContextProvider = ({ children }) => {
         getCartCount,
         getCartAmount,
         axios,
-        fetchProducts
+        fetchProducts,
+        setCartItems
     };
 
     return (

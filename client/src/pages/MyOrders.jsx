@@ -2,19 +2,37 @@ import React, { useEffect } from 'react'
 import { useState } from 'react'
 import { assets, dummyOrders } from '../assets/assets'
 import { useAppContext } from '../context/AppContext'
+import toast from 'react-hot-toast'
 
 function MyOrders() {
     
     const [myOrders, setMyOrders] = useState([])
-    const {currency} = useAppContext();
+    const [loading, setLoading] = useState(false)
+    const {currency, user, axios} = useAppContext();
 
     const fetchMyOrders = async () => {
-        setMyOrders(dummyOrders);
+        setLoading(true);
+        try {
+            const { data } = await axios.get('/api/order/user', { withCredentials: true });
+            if(data.success){
+                console.log('Fetched orders:', data.orders.length, data.orders);
+                setMyOrders(data.orders);
+            } else {
+                toast.error(data.message || "Failed to fetch orders");
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to fetch orders");
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
-        fetchMyOrders();
-    },[])
+        if(user){
+            fetchMyOrders();
+        }
+    },[user?._id]) // Only depend on user ID, not the entire user object
 
   return (
     <div className='mt-16 pb-16'>
@@ -22,8 +40,19 @@ function MyOrders() {
             <p className='text-2xl font-medium uppercase'>My Orders</p>
             <div className='w-16 h-0.5 bg-primary rounded-full'></div>
         </div> 
-        {myOrders.map((order, index) => (
-            <div key={index} className='border border-gray-300 rounded-lg mb-10 p-4 py-5 max-w-4xl'>
+        
+        {loading ? (
+            <div className='flex justify-center items-center py-8'>
+                <p className='text-gray-500'>Loading orders...</p>
+            </div>
+        ) : myOrders.length === 0 ? (
+            <div className='flex flex-col items-center justify-center py-8'>
+                <p className='text-gray-500 text-lg mb-4'>No orders found</p>
+                <p className='text-gray-400'>You haven't placed any orders yet.</p>
+            </div>
+        ) : (
+            myOrders.map((order, index) => (
+            <div key={order._id || index} className='border border-gray-300 rounded-lg mb-10 p-4 py-5 max-w-4xl'>
                 <p className='flex justify-between md:items-center text-gray-400 md:font-medium max-md:flex-col'>
                     <span>OrderId : {order._id}</span>
                     <span>Payment : {order.paymentType}</span>
@@ -52,7 +81,8 @@ function MyOrders() {
                     </div>  
                 ))}
             </div>
-        ))}
+        ))
+        )}
     </div>
   )
 }

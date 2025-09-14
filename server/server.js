@@ -10,6 +10,7 @@ import productRouter from './routes/productRoute.js';
 import cartRouter from './routes/cartRoute.js';
 import addressRouter from './routes/addressRoute.js';
 import orderRouter from './routes/orderRoute.js';
+import { stripeWebhook } from './controllers/orderController.js';
 
 
 const app = express();
@@ -17,6 +18,8 @@ const PORT = process.env.PORT || 5000;
 
 // allow multiple origins
 const allowedOrigins = ['http://localhost:5173'];
+
+app.post('/stripe', express.raw({type: 'application/json'}, stripeWebhook));
 
 (async () => {
   await connectDB();
@@ -26,6 +29,7 @@ const allowedOrigins = ['http://localhost:5173'];
   app.use(express.json());
   app.use(cookieParser());
   app.use(cors({origin: allowedOrigins, credentials: true}));
+
 
   app.get("/", (req, res) => {
       res.send("API is running...");
