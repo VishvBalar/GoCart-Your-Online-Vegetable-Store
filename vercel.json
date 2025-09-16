@@ -3,5 +3,5 @@
     "builds": [{ "src": "server/server.js", "use": "@now/node", "config": {
         "outputDirectory": "server"
       } }],
-    "routes": [{ "src": "(.*)", "dest": "server/server.js" }]
+    "routes": [{ "src": "/(.*)", "dest": "server/server.js" }]
 }
