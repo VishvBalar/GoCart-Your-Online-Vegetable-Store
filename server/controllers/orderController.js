@@ -1,8 +1,8 @@
-import Product from "../models/Product.js";
-import Order from "../models/Order.js";
+import Product from "../models/product.js";
+import Order from "../models/order.js";
 import Stripe from "stripe";
 import { response } from "express";
-import User from "../models/User.js";
+import User from "../models/user.js";
 
 // Place Order COD : /api/order/cod
 
