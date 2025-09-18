@@ -16,9 +16,6 @@ import { stripeWebhook } from './controllers/orderController.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// allow multiple origins
-const allowedOrigins = ['http://localhost:5173','https://go-cart-your-online-vegetable-store-woad.vercel.app'];
-
 (async () => {
   await connectDB();
   await connectCloudinary();
@@ -26,7 +23,10 @@ const allowedOrigins = ['http://localhost:5173','https://go-cart-your-online-veg
   // Middleware configuration
   app.use(express.json());
   app.use(cookieParser());
-  app.use(cors({origin: allowedOrigins, credentials: true}));
+  app.use(cors({
+  origin: (origin, callback) => callback(null, origin), // reflect request origin
+  credentials: true
+}));
 
 app.post('/stripe', express.raw({type: 'application/json'}, stripeWebhook));
   app.get("/", (req, res) => {
